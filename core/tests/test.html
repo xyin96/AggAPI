@@ -2,12 +2,22 @@
 <html>
     <script src="http://code.jquery.com/jquery-2.1.3.min.js"> </script>
     <script src="../classes/api.js"></script>
+    <script src="../classes/api-sequence.js"></script>
     
     <body>
         <script>
-            var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat=$()&lon=$()"], [35, 139], {main:"weather[0].main"});
+            var $ip = new Api(["http://www.telize.com/geoip/$()"], [{lat:"latitude", lon:"longitude"}]);
+            var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat=$()&lon=$()", 
+                              "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22nome%2C%20ak%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"],
+                             [{temp:"main.temp",weather:"weather[0].main"}, // return schema name:"location in original api response"
+                              {"*":null}]);
                 $a.test();
-            $a.execute();
+            var seq = [$ip, $a];
+            var $as = new ApiSequence(seq, [["46.19.37.108"], ["$(response[0].lat)","$(response[0].lon)"]], function(data){
+                console.log(data.response[1].weather);
+            });
+            $as.execute();    
+
         </script>
     </body>
 </html>

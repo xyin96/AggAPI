@@ -1,8 +1,7 @@
-function Api(apis, req_vars, res_type){
+function Api(apis, res_type){
     this.apis = apis;
-    this.req_vars = req_vars;
     this.res_type = res_type;
-    
+    this.req_vars = [];
 }
 Api.prototype = {
     test: function(){
@@ -10,11 +9,14 @@ Api.prototype = {
         console.log(this.req_vars);
         console.log(this.res_type);
     },
-    execute: function(){
+    execute: function(onComplete){
+        this._onComplete = onComplete;
         this.response = this.res_type;
         this._constructRequest();        
         this._constructResponse();
-
+    },
+    _prepare: function(req_vars){
+        this.req_vars = req_vars;
     },
     _constructRequest: function(){
         this.request = this.apis;
@@ -30,14 +32,17 @@ Api.prototype = {
         
     },
     _constructResponse: function(){
-        var d, that = this;
-        $.getJSON(this.request[0], function(data){
-            d = data;
-            console.log(d);
-            for(var propertyName in that.res_type){
-                that.response[propertyName] = that._byString(data, that.res_type.main);
+        var d, that = this, api_id = 0;
+        $.getJSON(this.request[api_id], function(data){
+            
+            for(var propertyName in schema = that.res_type[api_id]){
+                if(propertyName === "*"){
+                    that.response = data;
+                } else {
+                    that.response[propertyName] = that._byString(data, schema[propertyName]);
+                }
             }
-            console.log(that.response);
+            that._onComplete(that.response);
         });
     },
     _byString: function(o, s) {
@@ -53,5 +58,6 @@ Api.prototype = {
             }
         }
         return o;
-    }
+    },
+    _onComplete: function(/* data */){}
 }
