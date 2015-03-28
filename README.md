@@ -1,2 +1,2 @@
 # hackpsu
-# bing search API key : 4CNclNKmij9TI4GSuWsklaXQgNDMX6unbKOTp4vIvdo
+# bing search API key : https://api.datamarket.azure.com/Bing/Search/v1/Composite
