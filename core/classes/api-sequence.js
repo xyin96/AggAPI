@@ -4,6 +4,7 @@ function ApiSequence(apis, vars, oncomplete){
     this.response = [];
     this.index = 0;
     this._onComplete = oncomplete;
+    return this;
 }
 ApiSequence.prototype = {
     execute: function(){

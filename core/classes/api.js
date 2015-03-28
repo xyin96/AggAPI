@@ -2,6 +2,7 @@ function Api(apis, res_type){
     this.apis = apis;
     this.res_type = res_type;
     this.req_vars = [];
+    return this;
 }
 Api.prototype = {
     test: function(){
