@@ -5,7 +5,7 @@
     
     <body>
         <script>
-            var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat={{}}&lon={{}}"], [35, 139], {"main":"weather[0].main"});
+            var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat=$()&lon=$()"], [35, 139], {main:"weather[0].main"});
                 $a.test();
             $a.execute();
         </script>

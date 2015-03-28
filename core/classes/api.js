@@ -4,7 +4,6 @@ function Api(apis, req_vars, res_type){
     this.res_type = res_type;
     
 }
-
 Api.prototype = {
     test: function(){
         console.log(this.apis);
@@ -12,28 +11,47 @@ Api.prototype = {
         console.log(this.res_type);
     },
     execute: function(){
-        this.constructRequest();
-        $.getJSON(this.apis[0], function(data){
-            var items = [];
-            console.log(data);
-            $.each( data, function( key, val ) {
-                items.push( "<li id='" + key + "'>" + val + "</li>" );
-            });
+        this.response = this.res_type;
+        this._constructRequest();        
+        this._constructResponse();
 
-            $( "<ul/>", {
-                "class": "my-new-list",
-                html: items.join( "" )
-            }).appendTo( "body" );
-        });
     },
-    constructRequest: function(){
+    _constructRequest: function(){
         this.request = this.apis;
-        for(var j = 0; j < request.length; j++){
-            console.log(this);
-            for(var i = 0; i < req_vars.length; i ++){
-                that.replace("{{}}", this.req_vars[index]);
+        for(var j = 0; j < this.request.length; j++){
+            var req = this.request[j]
+            var constructHelper = "";
+            for(var i = 0; i < this.req_vars.length; i ++){
+                req = req.replace(/\$\(\)/, this.req_vars[i])
             }
+            this.request[j] = req;
+            
         }
         
+    },
+    _constructResponse: function(){
+        var d, that = this;
+        $.getJSON(this.request[0], function(data){
+            d = data;
+            console.log(d);
+            for(var propertyName in that.res_type){
+                that.response[propertyName] = that._byString(data, that.res_type.main);
+            }
+            console.log(that.response);
+        });
+    },
+    _byString: function(o, s) {
+        s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+        s = s.replace(/^\./, '');           // strip a leading dot
+        var a = s.split('.');
+        for (var i = 0, n = a.length; i < n; ++i) {
+            var k = a[i];
+            if (k in o) {
+                o = o[k];
+            } else {
+                return;
+            }
+        }
+        return o;
     }
 }
