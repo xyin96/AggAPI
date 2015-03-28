@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+    <script src="http://code.jquery.com/jquery-2.1.3.min.js"> </script>
+    <script src="../classes/api.js"></script>
+    
+    <body>
+        <script>
+            var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat={{}}&lon={{}}"], [35, 139], {"main":"weather[0].main"});
+                $a.test();
+            $a.execute();
+        </script>
+    </body>
+</html>
