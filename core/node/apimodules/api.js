@@ -13,7 +13,7 @@ function Api(apis, res_type){
             this._onComplete = onComplete;
             this.response = {};
             this._constructRequest();        
-            this._constructResponse();
+            this._constructResponse(0);
         },
         _prepare: function(req_vars){
             this.req_vars = req_vars;
@@ -31,19 +31,25 @@ function Api(apis, res_type){
             }
 
         },
-        _constructResponse: function(){
-            var d, that = this, api_id = 0;
-            
+        _constructResponse: function(api_id){
+            var d, that = this;
+            console.log(api_id);
             req({url: this.request[api_id], json:true}, function(error, response, data){
-                for(var propertyName in schema = that.res_type[api_id]){
-                    if(propertyName === "*"){
-                        that.response = data;
-                    } else {
-                        console.log(propertyName.type);
-                        that.response[propertyName] = that._byString(data, schema[propertyName]);
+                console.log("Inside request: " + api_id);
+                if(response.statusCode != 200 && api_id < that.apis.length - 1){
+                    console.log("it happened");
+                    that._constructResponse(api_id + 1);
+                } else {
+                    for(var propertyName in schema = that.res_type[api_id]){
+                        if(propertyName === "*"){
+                            that.response = data;
+                        } else {
+                            console.log(propertyName.type);
+                            that.response[propertyName] = that._byString(data, schema[propertyName]);
+                        }
                     }
+                    that._onComplete(that.response);
                 }
-                that._onComplete(that.response);
             });
         },
         _byString: function(o, s) {

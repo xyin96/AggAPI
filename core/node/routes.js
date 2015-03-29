@@ -2,12 +2,17 @@ var express = require('express');
 var apiaddr = require('./apiaddr.js');
 var apisequence = require('./apimodules/api-sequence.js');
 var api = require('./apimodules/api.js');
+var bodyparser = require('body-parser');
 
 var app = express();
 //app.set('views', path.join(__dirname, '../public/views'));
 app.set('view engine', 'ejs');
 app.set('views', __dirname + "/views");
-//app.use(express.bodyParser());
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({
+	extended: true
+}));
+//app.use(bodyparser);
 
 /* Begin routing */
 app.get('/:api(\\w+)/:macro(\\w+)/:vars([\/,\\w]*)', function(req, res) {
@@ -49,43 +54,40 @@ app.get('/:api(\\w+)/:macro(\\w+)/:vars([\/,\\w]*)', function(req, res) {
 });
 
 app.get('/update', function(req, res) {
+	if(req.params.apikey){
+		console.log(req.params.apikey + " " + req.params.macro);
+	}
 	res.render('update');
 	res.end();
 });
 
 app.post('/update', function(req, res) {
-	console.log(req);
+	console.log("Body Key: " + req.body.apikey);
 	var key = req.body.apikey;
 	var macro = req.body.macro;
+	var apis = req.body.apis; // "'google.com','as;dklfjaslkdjfl'"
 
 	console.log(key + " " + macro);
 
+	/* this is where shit starts breaking */
+	//apis = apis.split(',');
+
+
+
+	/* Create new macros */
 	apiaddr.findOne({'apikey':key}, function(err, result) {
 		if (result) {
-			/* Update result macros and save it back in the db */
-			result.macros[macro] = {
+			var macros = result.macros;
+			console.log(macros);
+			macros[macro] = {};
 
-			};
-
-			result.save(function(err){
-				if (err) return handleError(err);
-			});
-		} else {
-			var apimodel = new apiaddr({
-				apikey : key,
-				macros : {
-					macro : {
-
-					}
-				}
-			});
-
-			apimodel.save(function(err) {
-				if (err) return handleError(err);
+			apiaddr.update({'apikey':key},{'$set' : {'macros' : macros}}, function(err) {
+				if (err) handleError(err);
 			});
 		}
 	});
 
+	res.end();
 });
 /* End routing */
 
