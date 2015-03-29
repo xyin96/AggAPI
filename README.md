@@ -13,7 +13,8 @@ Api(patterns, responseSchema);
 
 # Demo Usage:
 This demo takes an ip address, and runs through two apis to get the local weather ofat the location of the computer with that IP.
-'''
+
+```
 var $ip = new Api(["http://www.telize.com/geoip/$()"], [{lat:"latitude", lon:"longitude"}]);
 var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat=$()&lon=$()", 
                               "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22nome%2C%20ak%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"],
@@ -23,4 +24,4 @@ var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat=$()&lon=$(
 var $as = new ApiSequence([$ip,$a], [["54.84.241.99"], ["$(response[0].lat)","$(response[0].lon)"]], function(data){
                 console.log(data.response[1].weather);
             });
-'''
+```
