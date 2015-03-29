@@ -8,6 +8,7 @@ function ApiSequence(apis, vars, oncomplete){
         index:0,
         _onComplete:oncomplete,
         execute: function(){
+            console.log(this.response);
             var that = this;
             if(this.index < this.apis.length){
                 this._prepare(this.index);
@@ -32,7 +33,10 @@ function ApiSequence(apis, vars, oncomplete){
             console.log(api_index);
             for(var i = 0; i < var_schema.length; i ++){
                 if(uri = var_schema[i].match(/\$\((.*)\)/)){
-                    var_schema[i] = this._byString(this, var_schema[i].replace(/\$\((.*)\)/,"$1")); 
+                    console.log("matched");
+                    console.log(var_schema[i].replace(/\$\((.*)\)/,"$1"));
+                    var_schema[i] = this._byString(this, var_schema[i].replace(/\$\((.*)\)/,"$1").trim(" ")); 
+                    console.log(this.response.response0.lon);
                 }
                 pApi.req_vars.push(var_schema[i]);
             }

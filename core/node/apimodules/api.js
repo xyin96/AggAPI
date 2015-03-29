@@ -26,6 +26,7 @@ function Api(apis, res_type){
                 for(var i = 0; i < this.req_vars.length; i ++){
                     req = req.replace(/\$\(\)/, this.req_vars[i])
                 }
+                console.log(req);
                 this.request[j] = req;
 
             }
