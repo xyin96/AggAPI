@@ -33,7 +33,5 @@ var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat=$()&lon=$(
 var $as = new ApiSequence([$ip,$a], [["54.84.241.99"], ["$(response[0].lat)","$(response[0].lon)"]], function(data){
                 console.log(data.response[1].weather);
             });
+$as.execute();
 ```
-
-
-https://maps.googleapis.com/maps/api/geocode/json?latlng=$(),$()&key=AIzaSyDmqbOvCO6seEzPfFoQi-xn3phiv8igk5M
