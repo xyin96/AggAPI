@@ -4,7 +4,7 @@ function ApiSequence(apis, vars, oncomplete){
     return {
         apis:apis,
         vars:vars,
-        response:[],
+        response:{},
         index:0,
         _onComplete:oncomplete,
         execute: function(){
@@ -12,7 +12,8 @@ function ApiSequence(apis, vars, oncomplete){
             if(this.index < this.apis.length){
                 this._prepare(this.index);
                 this.apis[this.index].execute(function(data){
-                    that.response.push(data);
+                    console.log("poop: " + data);
+                    that.response["response" + that.index] = data;
                     that._next();
                 });
             } else {

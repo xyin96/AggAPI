@@ -4,6 +4,10 @@ var apisequence = require('./apimodules/api-sequence.js');
 var api = require('./apimodules/api.js');
 
 var app = express();
+//app.set('views', path.join(__dirname, '../public/views'));
+app.set('view engine', 'ejs');
+app.set('views', __dirname + "/views");
+//app.use(express.bodyParser());
 
 /* Begin routing */
 app.get('/:api(\\w+)/:macro(\\w+)/:vars([\/,\\w]*)', function(req, res) {
@@ -33,11 +37,55 @@ app.get('/:api(\\w+)/:macro(\\w+)/:vars([\/,\\w]*)', function(req, res) {
 		console.log(apiArray);
 
 		var as = apisequence(apiArray, macro.varSchema, function(data) {
-			console.log(data.response[1].weather);
+			res.write("{");
+			for(var i = 0; i < data.apis.length; i++){
+				res.write("response" + i + ":" + JSON.stringify(data.apis[i].response) + ",");
+			}
+			res.end("}");
 		});
 		as.execute();
 
 	});
+});
+
+app.get('/update', function(req, res) {
+	res.render('update');
+	res.end();
+});
+
+app.post('/update', function(req, res) {
+	console.log(req);
+	var key = req.body.apikey;
+	var macro = req.body.macro;
+
+	console.log(key + " " + macro);
+
+	apiaddr.findOne({'apikey':key}, function(err, result) {
+		if (result) {
+			/* Update result macros and save it back in the db */
+			result.macros[macro] = {
+
+			};
+
+			result.save(function(err){
+				if (err) return handleError(err);
+			});
+		} else {
+			var apimodel = new apiaddr({
+				apikey : key,
+				macros : {
+					macro : {
+
+					}
+				}
+			});
+
+			apimodel.save(function(err) {
+				if (err) return handleError(err);
+			});
+		}
+	});
+
 });
 /* End routing */
 

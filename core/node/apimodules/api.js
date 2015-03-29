@@ -11,7 +11,7 @@ function Api(apis, res_type){
         },
         execute: function(onComplete){
             this._onComplete = onComplete;
-            this.response = this.res_type;
+            this.response = {};
             this._constructRequest();        
             this._constructResponse();
         },
@@ -39,6 +39,7 @@ function Api(apis, res_type){
                     if(propertyName === "*"){
                         that.response = data;
                     } else {
+                        console.log(propertyName.type);
                         that.response[propertyName] = that._byString(data, schema[propertyName]);
                     }
                 }
