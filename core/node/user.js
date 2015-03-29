@@ -10,19 +10,29 @@ var userSchema = new Schema(
 	apikey : String
 }, {collection: 'usercollection'});
 
-userSchema.methods.generateHash = function(password) {
-	var user = this;
-	bcrypt.genSalt(8, function(err, encrypted) {
-		if (err) {
-			System.log(err);
-		}
+userSchema.methods.generateHash = function(string) {
+	// Hash the password with the salt
+	var hash = bcrypt.hashSync(string, this.apikey);
+	// console.log(hash);
+	return hash;
+}
 
-		bcrypt.hash(password, encrypted, function(userpass) {
-			user.password = userpass;
-		});
-	});
+userSchema.methods.setPassword = function(password){
+	this.password = this.generateHash(password);
+}
+
+userSchema.methods.generateKey = function(string, callback) {
+	this.apikey = bcrypt.genSaltSync(8);
+
 }
 
 userSchema.methods.validPassword = function(password) {
-	bcrypt.compareSync(password, this.password);
+	var that = this;
+	 console.log(this.generateHash(password) + " " +  this.password);
+	// console.log(this.generateHash(password) + " " +  this.password);
+	// console.log(this.generateHash(password) + " " +  this.password);
+	// console.log(this.generateHash(password) + " " +  this.password);
+	return this.generateHash(password) == this.password;
 }
+
+module.exports = mongoose.model('user', userSchema);
