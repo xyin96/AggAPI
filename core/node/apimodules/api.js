@@ -37,7 +37,7 @@ function Api(apis, res_type){
             console.log(api_id);
             req({url: this.request[api_id], json:true}, function(error, response, data){
                 console.log("Inside request: " + api_id);
-                if(response.statusCode != 200 && api_id < that.apis.length - 1){
+                if((!response || response.statusCode != 200) && api_id < that.apis.length - 1){
                     console.log("it happened");
                     that._constructResponse(api_id + 1);
                 } else {
