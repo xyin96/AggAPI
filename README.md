@@ -1,6 +1,15 @@
 # AggApi (API Aggregate)
 This project allows users to create a customizable API that chains different APIs together and returns the aggregated results in a single package.
 
+# Features
+AggAPI allows developers to create customizable API macros. Features include:
+
+ * Chain Linking API calls: Automatically call several API's with one HTTP request
+ * API Backup system: developers can designate backup apis, which will be called if higher priority API's fail
+ * Response Schemas: using the API backup system, response schemas all developers to map response properties to response values in the original response
+ * Response Forwarding: responses from API calls can be forwarded to API's called afterward
+ * Aggregated response: keep all the response information that you used along the entire process.
+
 # USAGE
 ApiSequence(apis, [params, callback]);
  * apis - Array of Api Objects. this denotes how the api calls are formed. $() denotes a variable, which will be filled in based on the parameter schema
