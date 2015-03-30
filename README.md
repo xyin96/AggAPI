@@ -63,7 +63,9 @@ $as.execute(["46.19.37.108"], [
     },
     function(data){
         console.log("final");
-        $("body").html(data.response2.weather);
+        var newDoc = document.open("text","replace");
+        newDoc = newDoc.write("<pre>" + JSON.stringify(data, undefined, 2) + "</pre>");
+        newDoc.close();
     }
 ]);    
 
