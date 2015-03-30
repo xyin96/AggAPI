@@ -13,10 +13,10 @@
                               {"*":null}]);
                 $a.test();
             var seq = [$ip, $a];
-            var $as = new ApiSequence(seq, [["46.19.37.108"], ["$(response[0].lat)","$(response[0].lon)"]], function(data){
-                console.log(data.response[1].weather);
+            var $as = new ApiSequence(seq, [["$get(0)"],["response.response0.lat","response.response0.lon"]], function(data){
+                $("body").html(data.response.response1.weather);
             });
-            $as.execute();    
+            $as.execute(["46.19.37.108"]);    
 
         </script>
     </body>
