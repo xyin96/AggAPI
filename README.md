@@ -26,10 +26,7 @@ This demo takes an ip address, and runs through two apis to get the local weathe
 ```
 var $ip = new Api(["http://www.telize.com/geoip/$()"], [{lat:"latitude", lon:"longitude"}]);
 var $reverseGeoCode = new Api(["https://maps.googleapis.com/maps/api/geocode/json?latlng=$(),$()&key=AIzaSyDmqbOvCO6seEzPfFoQi-xn3phiv8igk5M"], [{addr: "results[0].formatted_address"}])
-var $weather = new Api(["http://api.openweathermap.org/data/2.5/weather?q=$()", 
-                              "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22$()%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"],
-                             [{temp:"main.temp",weather:"weather[0].description"}, // return schema name:"location in original api response"
-                              {temp:"query.results.channel.condition.temp", weather:"query.results.channel.condition.text"}]);
+var $weather = new Api(["http://api.openweathermap.org/data/2.5/weather?q=$()","https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22$()%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"],[{temp:"main.temp",weather:"weather[0].description"},{temp:"query.results.channel.condition.temp", weather:"query.results.channel.condition.text"}]);
 var seq = [$ip, $reverseGeoCode, $weather];
 var $as = new ApiSequence(seq, [["$get(0)"],["$(response.response0.lat)","$(response.response0.lon)"],["$(response.response1.country)"]]);
             
