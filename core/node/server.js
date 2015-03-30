@@ -9,6 +9,6 @@ var mongoose = mongo.connect('mongodb://localhost:27017/AGGAPI');
 
 var app = require('./routes.js');
 
-http.createServer(app).listen(8080, '127.0.0.1');
+http.createServer(app).listen(1337, '127.0.0.1');
 
 console.log('Server running at http://127.0.0.1:1337/');
