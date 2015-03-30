@@ -11,27 +11,39 @@ AggAPI allows developers to create customizable API macros. Features include:
  * Aggregated response: keep all the response information that you used along the entire process.
 
 # USAGE
-ApiSequence(apis, [params, callback]);
+ApiSequence(apis, [params]);
  * apis - Array of Api Objects. this denotes how the api calls are formed. $() denotes a variable, which will be filled in based on the parameter schema
- * params - Array of param schemas. to retrieve parameter from url $get(id), to retrieve parameter from previous api response, $(response[api_index].param 
- * callback - function to call on sequence complete
+ * params - Array of param schemas. to retrieve parameter from url $get(id), to retrieve parameter from previous api response, $(response["response" + api_id].param)
+
+ApiSequence.execute([params, callback])
+ * params - parameters to be passed into the ApiSequence
+ * callback - array of callback functions to be executed on completion of corresponding api
 
 Api(patterns, responseSchema);
  * patterns - array of urls with $() denoting variable content (based on parameters or previous api calls)
  * responseSchema - array of objects mapping desired response values to their location in the original json response.
 
 # Demo Usage:
-This demo takes an ip address, and runs through two apis to get the local weather ofat the location of the computer with that IP.
+This demo takes an ip address, converts it into lat/lng, reverse geocodes it for the country name, and gets the weather.
 
 ```
 var $ip = new Api(["http://www.telize.com/geoip/$()"], [{lat:"latitude", lon:"longitude"}]);
-var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat=$()&lon=$()","https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22nome%2C%20ak%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"],[{temp:"main.temp",weather:"weather[0].main"}, {"*":null}]);
-
-var seq = [$ip, $a];
-var $as = new ApiSequence(seq, [["$get(0)"],["response.response0.lat","response.response0.lon"]]);
+var $reverseGeoCode = new Api(["https://maps.googleapis.com/maps/api/geocode/json?latlng=$(),$()&key=AIzaSyDmqbOvCO6seEzPfFoQi-xn3phiv8igk5M"], [{addr: "results[0].formatted_address"}])
+var $weather = new Api(["http://api.openweathermap.org/data/2.5/weather?q=$()","https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22$()%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"],[{temp:"main.temp",weather:"weather[0].description"},{temp:"query.results.channel.condition.temp", weather:"query.results.channel.condition.text"}]);
+var seq = [$ip, $reverseGeoCode, $weather];
+var $as = new ApiSequence(seq, [["$get(0)"],["$(response.response0.lat)","$(response.response0.lon)"],["$(response.response1.country)"]]);
             
-$as.execute(["46.19.37.108"], function(data){
-    console.log(data);
-    $("body").html(data.response1.weather);
-});  
+$as.execute(["46.19.37.108"], [
+                null,
+                function(data){
+                    console.log("hi");
+                    var temp = data.response1.addr.split(", ");
+                    data.response1.country = temp[temp.length - 1];
+                },
+                function(data){
+                    console.log("final");
+                    $("body").html(data.response2.weather);
+                }
+]);    
+
 ```
