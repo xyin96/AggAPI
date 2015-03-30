@@ -25,13 +25,13 @@ This demo takes an ip address, and runs through two apis to get the local weathe
 
 ```
 var $ip = new Api(["http://www.telize.com/geoip/$()"], [{lat:"latitude", lon:"longitude"}]);
-var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat=$()&lon=$()", 
-                              "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22nome%2C%20ak%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"],
-                             [{temp:"main.temp",weather:"weather[0].main"}, // return schema name:"location in original api response"
-                              {"*":null}]);
+var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat=$()&lon=$()","https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22nome%2C%20ak%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"],[{temp:"main.temp",weather:"weather[0].main"}, {"*":null}]);
 
-var $as = new ApiSequence([$ip,$a], [["$get(0)"], ["$(response.response0.lat)","$(response.response0.lon)"]]);
-$as.execute([54.84.241.99],function(data){
-                console.log(response1.weather);
-            });
+var seq = [$ip, $a];
+var $as = new ApiSequence(seq, [["$get(0)"],["response.response0.lat","response.response0.lon"]]);
+            
+$as.execute(["46.19.37.108"], function(data){
+    console.log(data);
+    $("body").html(data.response1.weather);
+});  
 ```
