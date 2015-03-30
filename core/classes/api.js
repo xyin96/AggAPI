@@ -37,14 +37,24 @@ function Api(apis, res_type){
                 if((!data) && api_id < that.apis.length - 1){
                     that._constructResponse(api_id + 1);
                 } else {
-                    for(var propertyName in schema = that.res_type[api_id]){
-                        if(propertyName === "*"){
-                            that.response = data;
+                    try{
+                        for(var propertyName in schema = that.res_type[api_id]){
+                            console.log(that.res_type[api_id]);
+                            if(propertyName === "*"){
+                                that.response = data;
+                            } else {
+                                that.response[propertyName] = that._byString(data, schema[propertyName]);
+                                console.log(that.response[propertyName]);
+                            }
+                        }
+                        that._onComplete(that.response);
+                    } catch (err) {
+                        if(api_id < that.apis.length - 1){
+                            that._constructResponse(api_id + 1);
                         } else {
-                            that.response[propertyName] = that._byString(data, schema[propertyName]);
+                            /* Stale return */
                         }
                     }
-                    that._onComplete(that.response);
                 }
             });
         },
@@ -65,5 +75,3 @@ function Api(apis, res_type){
         _onComplete: function(/* data */){}
     }
 }
-
-module.exports = Api;

@@ -3,34 +3,38 @@ function ApiSequence(apis, vars){
         apis:apis,
         vars:vars,
         response:{},
-        execute: function(params, callback, index){
-            var that = this;
-            if(index === undefined || index < 0){
+        execute: function(params, callbacks, index){
+            var that = this, callback = callbacks[index];
+            if(index == undefined || index == null || index == NaN|| index < 0){
                 index = 0;
             }
-            if(index < this.apis.length){
-                this._prepare(index, params);
+            console.log("index" + index);
+            console.log("apilength" + this.apis.length);
+            this._prepare(index, params);
+            if(index < apis.length){
                 this.apis[index].execute(function(data){
-                    console.log("poop: " + data);
+                    console.log("poop: " + index);
                     that.response["response" + index] = data;
-                    that.execute(params, callback, index + 1);
+                    if(callback){
+                        callback(that.response);
+                    }
+                    console.log(JSON.stringify(that.response));
+                    if(index + 1 < apis.length){
+                        that.execute(params, callbacks, index + 1);
+                    }
                 });
-            } else {
-                callback(this.response);
             }
-
+                
+            
         },
         _prepare: function(api_index, params){
             var pApi = this.apis[api_index], var_schema = this.vars[api_index];
             pApi.req_vars = [];
             console.log(this.vars);
-            console.log(api_index);
             for(var i = 0; i < var_schema.length; i ++){
                 if(uri = var_schema[i].match(/\$\((.*)\)/)){
-                    console.log("matched");
-                    console.log(var_schema[i].replace(/\$\((.*)\)/,"$1"));
                     var_schema[i] = this._byString(this, var_schema[i].replace(/\$\((.*)\)/,"$1").trim(" ")); 
-                    console.log(this.response.response0.lon);
+                    console.log(var_schema[i]);
                 } else if (uri = var_schema[i].match(/\$get\((.*)\)/)){
                     var_schema[i] = params[parseInt(var_schema[i].replace(/\$get\((.*)\)/, "$1"))];
                 }
@@ -53,5 +57,3 @@ function ApiSequence(apis, vars){
         }
     }
 }
-
-module.exports = ApiSequence;
