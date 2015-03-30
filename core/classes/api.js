@@ -34,29 +34,38 @@ function Api(apis, res_type){
             var d, that = this;
             console.log(api_id);
             $.getJSON(this.request[api_id], function(data){
-                if((!data) && api_id < that.apis.length - 1){
-                    that._constructResponse(api_id + 1);
-                } else {
-                    try{
-                        for(var propertyName in schema = that.res_type[api_id]){
-                            console.log(that.res_type[api_id]);
-                            if(propertyName === "*"){
-                                that.response = data;
-                            } else {
-                                that.response[propertyName] = that._byString(data, schema[propertyName]);
-                                console.log(that.response[propertyName]);
-                            }
-                        }
-                        that._onComplete(that.response);
-                    } catch (err) {
-                        if(api_id < that.apis.length - 1){
-                            that._constructResponse(api_id + 1);
+                try{
+                    for(var propertyName in schema = that.res_type[api_id]){
+                        console.log(that.res_type[api_id]);
+                        if(propertyName === "*"){
+                            that.response = data;
                         } else {
-                            /* Stale return */
+                            console.log(data);
+                            that.response[propertyName] = that._byString(data, schema[propertyName]);
+                            console.log(that.response[propertyName]);
                         }
                     }
+                    that._onComplete(that.response);
+                } catch (err) {
+                    if(api_id < that.apis.length - 1){
+                        that._constructResponse(api_id + 1);
+                    } else {
+                        /* Stale return */
+                    }
                 }
-            });
+            }).error(function(jqXHR, textStatus, errorThrown) {
+                if (textStatus == 'timeout')
+                    console.log('The server is not responding');
+
+                if (textStatus == 'error')
+                    console.log(errorThrown);
+
+                if(api_id < that.apis.length - 1){
+                    that._constructResponse(api_id + 1);
+                } else {
+                    /* Stale return */
+                }
+            });;
         },
         _byString: function(o, s) {
             s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
