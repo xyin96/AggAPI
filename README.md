@@ -6,7 +6,7 @@ AggAPI allows developers to create customizable API macros. Features include:
 
  * Chain Linking API calls: Automatically call several API's with one HTTP request
  * API Backup system: developers can designate backup apis, which will be called if higher priority API's fail
- * Response Schemas: using the API backup system, response schemas all developers to map response properties to response values in the original response
+ * Response Schemas: using the API backup system, response schemas all developers to map response properties to values from the original response
  * Response Forwarding: responses from API calls can be forwarded to API's called afterward
  * Aggregated response: keep all the response information that you used along the entire process.
 
@@ -29,8 +29,10 @@ This demo takes an ip address, converts it into lat/lng, reverse geocodes it for
 
 ```
 var $ip = new Api([
-    {url: "http://www.telize.com/geoip/$()", 
-     res_type: {lat:"latitude", lon:"longitude"}}
+      {
+        url: "http://www.telize.com/geoip/$()", 
+        res_type: {lat:"latitude", lon:"longitude"}
+      }
 ]);
 var $reverseGeoCode = new Api([
     {
@@ -40,8 +42,8 @@ var $reverseGeoCode = new Api([
 ])
 var $weather = new Api([
     {
-     url:"http://api.openweathermap.org/data/2.5/weather?q=$()",
-     res_type: {temp:"main.temp", weather:"weather[0].description"}
+       url:"http://api.openweathermap.org/data/2.5/weather?q=$()",
+       res_type: {temp:"main.temp", weather:"weather[0].description"}
     }, 
     {
         url:"https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22$()%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
