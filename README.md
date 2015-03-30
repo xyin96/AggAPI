@@ -11,9 +11,9 @@ AggAPI allows developers to create customizable API macros. Features include:
  * Aggregated response: keep all the response information that you used along the entire process.
 
 # USAGE
-ApiSequence(apis, [params]);
+ApiSequence(apis, [param-schema]);
  * apis - Array of Api Objects. this denotes how the api calls are formed. $() denotes a variable, which will be filled in based on the parameter schema
- * params - Array of param schemas. to retrieve parameter from url $get(id), to retrieve parameter from previous api response, $(response["response" + api_id].param)
+ * params-schema - Array of param schemas. This is how params will be passed from api to api. To retrieve parameter from url $get(id), to retrieve parameter from previous api response, $(response["response" + api_id].{paramname})
 
 ApiSequence.execute([params, callback])
  * params - parameters to be passed into the ApiSequence
