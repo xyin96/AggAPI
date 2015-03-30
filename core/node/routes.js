@@ -183,7 +183,7 @@ app.post('/signup', function(req, res) {
 					if (err) {
 						return handleError(err);
 					}
-					res.redirect('/update');
+					res.redirect('/login');
 				});
 			} else {
 				res.redirect('/signup');
