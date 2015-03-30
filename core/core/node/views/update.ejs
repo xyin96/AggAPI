@@ -1,0 +1,160 @@
+<!doctype html>
+<html ng-app="app">
+<head>
+Update Macro
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>
+angular.module("app", [])
+
+.controller("formCTRL", function($scope){
+	$scope.apikey = $("#apikey").html();
+	$scope.macro = "newmacro";
+	$("#fuckmacro").keyup(function(){
+		console.log("/findmacro/" + $scope.apikey + "/" + $("#fuckmacro").val());
+		$scope.apis = [];
+		$.get("/findmacro/" + $scope.apikey + "/" + $("#fuckmacro").val(), function(data){
+			
+		}).done(function(data){
+			console.log("failed");
+			var $data = JSON.parse(data);
+			console.log($data);
+			for(var i = 0; i < $data.apis.length; i++){
+				console.log(i);
+				$scope.loadApi($data, i);
+			}
+			console.log($scope.apis);
+		});
+	})
+	$scope.apis = [];
+	$scope.newApi = function(){
+		$scope.apis.push({
+			params: "",
+			formats: [""],
+			resSchemas: [],
+			newFormat: function(){
+				this.formats.push("");
+				this.resSchemas.push("{\"*\":null}");
+				console.log(this.formats);
+			},
+			_compile:function(){
+				var schemas = [];
+				for(var i = 0; i < this.resSchemas.length; i++){
+					schemas.push(JSON.parse(this.resSchemas[i]));
+
+				}
+				return {
+					"api":this.formats,
+					"resSchema": schemas
+				}
+			}
+		})
+	}
+	$scope.loadApi = function(data, index){
+		var formats = [], schema = [];
+		for(var i = 0; i < data.apis[index].api.length; i++){
+			formats.push(data.apis[index].api[i]);
+			schema.push(JSON.stringify(data.apis[index].resSchema[i]));
+		}
+		var api = {
+			params: data.varSchema[index].join(","),
+			formats: formats,
+			resSchemas: schema,
+			newFormat: function(){
+				this.formats.push("");
+				this.resSchemas.push("{\"*\":null}");
+				console.log(this.formats);
+
+			},
+			_compile:function(){
+				var schemas = [];
+				for(var i = 0; i < this.resSchemas.length; i++){
+					schemas.push(JSON.parse(this.resSchemas[i]));
+
+				}
+				return {
+					"api":this.formats,
+					"resSchema": schemas
+				}
+			}
+		};
+		// console.log(api.resSchema.join(","));
+		$scope.apis.push(api);
+	}
+	$scope.init = function(){
+
+	};
+	$scope._compile = function(){
+		var paramarray = [$scope.apis.length], apis = [];
+		for(var i = 0; i < $scope.apis.length; i++){
+			var tempArray = $scope.apis[i].params;
+			paramarray[i] = tempArray;
+			apis.push($scope.apis[i]._compile());
+		}
+		console.log(paramarray);
+		console.log(apis);
+		return {
+			"apikey":$scope.apikey,
+			"macro":$scope.macro,
+			"name":$scope.macro,
+			"varSchema":paramarray,
+			"apis":apis
+		}
+	}
+	$("#form #button").click(function(){
+		console.log($scope.apis);
+		console.log($scope._compile());
+		console.log("poop::::");
+		$.post("/update", $scope._compile(), function(data){console.log(pup)});
+		event.preventDefault();
+	});
+})
+</script>
+<style>
+	*{font-size:1.1em}
+	.button{
+		padding:15px;
+		background: rgba(163,217,83,0.7);
+		border:white solid thin;
+	}
+</style>
+</head>
+<body ng-controller="formCTRL">
+<i id="apikey" style="display:none"><%= key %></i>
+<FORM id="form" action="/update" method="post">
+	 <label> <span>Api Key:</span> 
+	 	{{apikey}}
+	 </label>
+	 <br>
+	 <label> <span>Macro Name:<i ng-model="macro"></i></span>
+	 	<input id="fuckmacro" type="text" ng-model="macro" name="macro" placeholder="Macro name" required />
+	 </label>
+	 <br>
+	 <!-- Api information here -->
+	<div ng-repeat="api in apis track by $index">
+		<h3>Api {{$index}}</h3>
+		<label> <span>Required Parameters</span>
+			<input id="param-{{$index}}" ng-model="apis[$index].params" type="text" name="apis" placeholder="apis" required />
+			{{apis[$index].params}}
+		</label><br><br>
+		<label ng-repeat="format in apis[$index].formats track by $index"> 
+			<span>URL Format</span>
+			<input id="format-{{$parent.$index}}-{{$index}}" type="text" ng-model = "apis[$parent.$index].formats[$index]" name="apis" placeholder="apis" required />{{format}}
+			<br>
+			<span>Response Schema</span>
+			<input id="param-{{$parent.$index}}-{{$index}}" type="text" ng-model = "apis[$parent.$index].resSchemas[$index]" name="apis" placeholder="apis" required />{{apis[$parent.$index].resSchemas[$index]}}
+			<br>
+			<br>
+		</label>
+		<input type="button" class="button" ng-click="api.newFormat()" value="new api format"></input>
+	</div>
+
+	<input type="button" class="button" ng-click="newApi()" value="new api"></input>
+	 <!-- End api information -->
+	 <br>
+	 <label> 
+	 	<input id="button" type="button" class="button" value="Send" action="submit" /> 
+	 </label>
+</form>
+</body>
+</html>
