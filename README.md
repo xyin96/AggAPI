@@ -30,8 +30,8 @@ var $a = new Api(["http://api.openweathermap.org/data/2.5/weather?lat=$()&lon=$(
                              [{temp:"main.temp",weather:"weather[0].main"}, // return schema name:"location in original api response"
                               {"*":null}]);
 
-var $as = new ApiSequence([$ip,$a], [["54.84.241.99"], ["$(response[0].lat)","$(response[0].lon)"]], function(data){
-                console.log(data.response.response1.weather);
+var $as = new ApiSequence([$ip,$a], [["$get(0)"], ["$(response.response0.lat)","$(response.response0.lon)"]]);
+$as.execute([54.84.241.99],function(data){
+                console.log(response1.weather);
             });
-$as.execute();
 ```
