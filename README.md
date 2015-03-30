@@ -19,31 +19,49 @@ ApiSequence.execute([params, callback])
  * params - parameters to be passed into the ApiSequence
  * callback - array of callback functions to be executed on completion of corresponding api
 
-Api(patterns, responseSchema);
- * patterns - array of urls with $() denoting variable content (based on parameters or previous api calls)
- * responseSchema - array of objects mapping desired response values to their location in the original json response.
+Api(patterns);
+ * patterns - array of Objects with 2 fields:
+   * url with $() denoting variable content (based on parameters or previous api calls)
+   * response schema: map origin api response values into a new data structure that can be used in future calls
 
 # Demo Usage:
 This demo takes an ip address, converts it into lat/lng, reverse geocodes it for the country name, and gets the weather.
 
 ```
-var $ip = new Api(["http://www.telize.com/geoip/$()"], [{lat:"latitude", lon:"longitude"}]);
-var $reverseGeoCode = new Api(["https://maps.googleapis.com/maps/api/geocode/json?latlng=$(),$()&key=AIzaSyDmqbOvCO6seEzPfFoQi-xn3phiv8igk5M"], [{addr: "results[0].formatted_address"}])
-var $weather = new Api(["http://api.openweathermap.org/data/2.5/weather?q=$()","https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22$()%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"],[{temp:"main.temp",weather:"weather[0].description"},{temp:"query.results.channel.condition.temp", weather:"query.results.channel.condition.text"}]);
+var $ip = new Api([
+    {url: "http://www.telize.com/geoip/$()", 
+     res_type: {lat:"latitude", lon:"longitude"}}
+]);
+var $reverseGeoCode = new Api([
+    {
+        url: "https://maps.googleapis.com/maps/api/geocode/json?latlng=$(),$()&key=AIzaSyDmqbOvCO6seEzPfFoQi-xn3phiv8igk5M",
+        res_type: {addr: "results[0].formatted_address"}
+    }
+])
+var $weather = new Api([
+    {
+     url:"http://api.openweathermap.org/data/2.5/weather?q=$()",
+     res_type: {temp:"main.temp", weather:"weather[0].description"}
+    }, 
+    {
+        url:"https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22$()%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
+        res_type: {temp:"query.results.channel.item.condition.temp", weather:"query.results.channel.item.condition.text"}
+    }
+]);
 var seq = [$ip, $reverseGeoCode, $weather];
 var $as = new ApiSequence(seq, [["$get(0)"],["$(response.response0.lat)","$(response.response0.lon)"],["$(response.response1.country)"]]);
-            
+
 $as.execute(["46.19.37.108"], [
-                null,
-                function(data){
-                    console.log("hi");
-                    var temp = data.response1.addr.split(", ");
-                    data.response1.country = temp[temp.length - 1];
-                },
-                function(data){
-                    console.log("final");
-                    $("body").html(data.response2.weather);
-                }
+    null,
+    function(data){
+        console.log("hi");
+        var temp = data.response1.addr.split(", ");
+        data.response1.country = temp[temp.length - 1];
+    },
+    function(data){
+        console.log("final");
+        $("body").html(data.response2.weather);
+    }
 ]);    
 
 ```
