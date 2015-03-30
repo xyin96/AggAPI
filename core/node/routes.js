@@ -64,6 +64,7 @@ app.get('/:api([\$a-zA-Z0-9.]+)/:macro([a-zA-Z0-9]+)/:vars([\$a-zA-Z0-9.\/\-\s%]
 	/* Create json from the url provided */
 	var macro = require('./macros/' + req.params.macro + '.js');
     macro(req, res);
+    delete require.cache[require.resolve('./macros/' + req.params.macro + '.js')];
 });
 
 app.get('/update/:key(*+)', function(req, res) {
