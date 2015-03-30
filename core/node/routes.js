@@ -59,7 +59,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 /* Begin routing */
-app.get('/:api([\$a-zA-Z0-9.]+)/:macro([a-zA-Z0-9]+)/:vars([\$a-zA-Z0-9.\/\-\s%]+)', function(req, res) {
+app.get('/:api([\$a-zA-Z0-9.]+)/:macro([a-zA-Z0-9]+)/:vars(.*)', function(req, res) {
 	console.log(req.params.api + " " + req.params.macro + " " + req.params.vars);
 	/* Create json from the url provided */
 	var macro = require('./macros/' + req.params.macro + '.js');
