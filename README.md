@@ -28,6 +28,7 @@ Api(patterns);
 This demo takes an ip address, converts it into lat/lng, reverse geocodes it for the country name, and gets the weather.
 
 ```
+// full code for this demo can be found /core/tests/test.html
 var $ip = new Api([
       {
         url: "http://www.telize.com/geoip/$()", 
