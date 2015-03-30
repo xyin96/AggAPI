@@ -9,18 +9,17 @@ function ApiSequence(apis, vars){
             var that = this, callback = callbacks[index];
             if(index == undefined || index == null || index == NaN|| index < 0){
                 index = 0;
+                callback = callbacks[0];
             }
             console.log("index" + index);
             console.log("apilength" + this.apis.length);
             this._prepare(index, params);
             if(index < apis.length){
                 this.apis[index].execute(function(data){
-                    console.log("poop: " + index);
                     that.response["response" + index] = data;
                     if(callback){
                         callback(that.response);
                     }
-                    console.log(JSON.stringify(that.response));
                     if(index + 1 < apis.length){
                         that.execute(params, callbacks, index + 1);
                     }
