@@ -62,39 +62,8 @@ app.use(passport.session());
 app.get('/:api([\$a-zA-Z0-9.]+)/:macro([a-zA-Z0-9]+)/:vars([\$a-zA-Z0-9.\/\-\s%]+)', function(req, res) {
 	console.log(req.params.api + " " + req.params.macro + " " + req.params.vars);
 	/* Create json from the url provided */
-	apiaddr.findOne({'apikey':req.params.api}, function(err, result) {
-		console.log(result);
-		console.log(req.params.macro);
-		var macro = result.getMacro(req.params.macro);
-		var vars = req.params.vars.split('\/');
-		/* Replace all of the variables and call in sequence */
-		for (var i = 0; i < macro.varSchema.length; i++) {
-			for (var j = 0; j < macro.varSchema[i].length; j++) {
-				if(macro.varSchema[i][j].match(/\$get\((\d+)\)/)){
-					macro.varSchema[i][j] = vars[parseInt(macro.varSchema[i][j].replace(/\$get\((\d+)\)/, "$1"))];
-				}
-			}
-		}
-		console.log(macro.varSchema);
-		var apis = macro["apis"];
-		var apiArray = [];
-
-		for (var i = 0; i < apis.length; i++){
-			apiArray.push(api(apis[i].api, apis[i].resSchema));
-		}
-
-		console.log(apiArray);
-
-		var as = apisequence(apiArray, macro.varSchema, function(data) {
-			res.write("{");
-			for(var i = 0; i < data.apis.length; i++){
-				res.write("response" + i + ":" + JSON.stringify(data.apis[i].response) + ",");
-			}
-			res.end("}");
-		});
-		as.execute();
-
-	});
+	var macro = require('./macros/' + req.params.macro + '.js');
+    macro(req, res);
 });
 
 app.get('/update/:key(*+)', function(req, res) {

@@ -1,13 +1,11 @@
 var req = require('request');
 
-function Api(apis, res_type){
+function Api(apis){
     return {
         apis: apis,
-        res_type: res_type,
         test: function(){
             console.log(this.apis);
             console.log(this.req_vars);
-            console.log(this.res_type);
         },
         execute: function(onComplete){
             this._onComplete = onComplete;
@@ -21,35 +19,43 @@ function Api(apis, res_type){
         _constructRequest: function(){
             this.request = this.apis;
             for(var j = 0; j < this.request.length; j++){
-                var req = this.request[j]
+                var req = this.request[j].url
                 var constructHelper = "";
                 for(var i = 0; i < this.req_vars.length; i ++){
                     req = req.replace(/\$\(\)/, this.req_vars[i])
                 }
                 console.log(req);
-                this.request[j] = req;
+                this.request[j].url = req;
 
             }
 
         },
         _constructResponse: function(api_id){
             var d, that = this;
-            console.log(api_id);
-            req({url: this.request[api_id], json:true}, function(error, response, data){
-                console.log("Inside request: " + api_id);
-                if((!response || response.statusCode != 200) && api_id < that.apis.length - 1){
-                    console.log("it happened");
-                    that._constructResponse(api_id + 1);
-                } else {
-                    for(var propertyName in schema = that.res_type[api_id]){
+            console.log("Request: " + api_id);
+            req.get(this.request[api_id].url, function(error, r, data){
+                try{
+                    data = JSON.parse(data);
+                    for(var propertyName in schema = that.apis[api_id].res_type){
+                        console.log(that.apis[api_id].res_type);
                         if(propertyName === "*"){
                             that.response = data;
                         } else {
-                            console.log(propertyName.type);
+                            console.log(data);
                             that.response[propertyName] = that._byString(data, schema[propertyName]);
+                            console.log(that.response[propertyName]);
                         }
                     }
                     that._onComplete(that.response);
+                    that._onComplete = function(){};
+                } catch (err) {
+                    if(api_id < that.apis.length - 1){
+                        that._constructResponse(api_id + 1);
+                    } else {
+                        /* Stale return */
+                        that._onComplete(that.response);
+                        that._onComplete = function(){};
+                    }
                 }
             });
         },
@@ -70,5 +76,6 @@ function Api(apis, res_type){
         _onComplete: function(/* data */){}
     }
 }
+
 
 module.exports = Api;
