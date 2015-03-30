@@ -1,11 +1,9 @@
-function Api(apis, res_type){
+function Api(apis){
     return {
         apis: apis,
-        res_type: res_type,
         test: function(){
             console.log(this.apis);
             console.log(this.req_vars);
-            console.log(this.res_type);
         },
         execute: function(onComplete){
             this._onComplete = onComplete;
@@ -19,13 +17,13 @@ function Api(apis, res_type){
         _constructRequest: function(){
             this.request = this.apis;
             for(var j = 0; j < this.request.length; j++){
-                var req = this.request[j]
+                var req = this.request[j].url
                 var constructHelper = "";
                 for(var i = 0; i < this.req_vars.length; i ++){
                     req = req.replace(/\$\(\)/, this.req_vars[i])
                 }
                 console.log(req);
-                this.request[j] = req;
+                this.request[j].url = req;
 
             }
 
@@ -33,10 +31,10 @@ function Api(apis, res_type){
         _constructResponse: function(api_id){
             var d, that = this;
             console.log(api_id);
-            $.getJSON(this.request[api_id], function(data){
+            $.getJSON(this.request[api_id].url, function(data){
                 try{
-                    for(var propertyName in schema = that.res_type[api_id]){
-                        console.log(that.res_type[api_id]);
+                    for(var propertyName in schema = that.apis[api_id].res_type){
+                        console.log(that.apis[api_id].res_type);
                         if(propertyName === "*"){
                             that.response = data;
                         } else {
