@@ -1,28 +1,24 @@
-function ApiSequence(apis, vars, oncomplete){
+function ApiSequence(apis, vars){
     return {
         apis:apis,
         vars:vars,
         response:{},
-        index:0,
-        _onComplete:oncomplete,
-        execute: function(params){
-            console.log(this.response);
+        execute: function(params, callback, index){
             var that = this;
-            if(this.index < this.apis.length){
-                this._prepare(this.index, params);
-                this.apis[this.index].execute(function(data){
+            if(index === undefined || index < 0){
+                index = 0;
+            }
+            if(index < this.apis.length){
+                this._prepare(index, params);
+                this.apis[index].execute(function(data){
                     console.log("poop: " + data);
-                    that.response["response" + that.index] = data;
-                    that._next();
+                    that.response["response" + index] = data;
+                    that.execute(params, callback, index + 1);
                 });
             } else {
-                this._onComplete(this);
+                callback(this.response);
             }
 
-        },
-        _next: function(){
-            this.index++;
-            this.execute();
         },
         _prepare: function(api_index, params){
             var pApi = this.apis[api_index], var_schema = this.vars[api_index];
