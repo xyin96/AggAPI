@@ -70,3 +70,18 @@ $as.execute(["46.19.37.108"], [
 ]);    
 
 ```
+
+# Setup your own AggAPI Server
+```
+git clone https://github.com/xyin96/AggAPI
+cd AggAPI/node
+node server.js
+```
+You now have a server that runs AggAPI! To try out our demo macro (node/macros/wp1.js):
+```
+http://localhost:1337/wp1/46.19.37.108
+```
+
+# Dependencies
+ * Node.js
+ * jQuery (if you're using embedded macroing)
