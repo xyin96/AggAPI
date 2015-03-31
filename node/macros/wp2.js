@@ -56,7 +56,6 @@ function wp1(req, res){
             console.log("end");
             console.log(data);
             $res.write(JSON.stringify(data, undefined, 2));
-            $res.end();
         }
     ]); 
 }
