@@ -10,6 +10,21 @@ AggAPI allows developers to create customizable API macros. Features include:
  * Response Forwarding: responses from API calls can be forwarded to API's called afterward
  * Aggregated response: keep all the response information that you used along the entire process.
 
+# Setup your own AggAPI Server
+```
+git clone https://github.com/xyin96/AggAPI
+cd AggAPI/node
+node server.js
+```
+You now have a server that runs AggAPI! To try out our demo macro (node/macros/wp1.js):
+```
+http://localhost:1337/wp1/46.19.37.108
+```
+
+# Dependencies
+ * Node.js
+ * jQuery (if you're using embedded macroing)
+
 # USAGE
 ApiSequence(apis, [param-schema]);
  * apis - Array of Api Objects. this denotes how the api calls are formed. $() denotes a variable, which will be filled in based on the parameter schema
@@ -70,3 +85,4 @@ $as.execute(["46.19.37.108"], [
 ]);    
 
 ```
+
