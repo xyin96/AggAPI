@@ -40,50 +40,58 @@ Api(patterns);
    * url with $() denoting variable content (based on parameters or previous api calls)
    * response schema: map origin api response values into a new data structure that can be used in future calls
 
-# Demo Usage:
+# Demo Macro Script:
 This demo takes an ip address, converts it into lat/lng, reverse geocodes it for the country name, and gets the weather.
 
 ```
-// full code for this demo can be found /core/tests/test.html
-var $ip = new Api([
-      {
-        url: "http://www.telize.com/geoip/$()", 
-        res_type: {lat:"latitude", lon:"longitude"}
-      }
-]);
-var $reverseGeoCode = new Api([
-    {
-        url: "https://maps.googleapis.com/maps/api/geocode/json?latlng=$(),$()&key=AIzaSyDmqbOvCO6seEzPfFoQi-xn3phiv8igk5M",
-        res_type: {addr: "results[0].formatted_address"}
-    }
-])
-var $weather = new Api([
-    {
-       url:"http://api.openweathermap.org/data/2.5/weather?q=$()",
-       res_type: {temp:"main.temp", weather:"weather[0].description"}
-    }, 
-    {
-        url:"https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22$()%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
-        res_type: {temp:"query.results.channel.item.condition.temp", weather:"query.results.channel.item.condition.text"}
-    }
-]);
-var seq = [$ip, $reverseGeoCode, $weather];
-var $as = new ApiSequence(seq, [["$get(0)"],["$(response.response0.lat)","$(response.response0.lon)"],["$(response.response1.country)"]]);
+var api = require('./../apimodules/api.js');
+var apisequence = require('./../apimodules/api-sequence.js');
 
-$as.execute(["46.19.37.108"], [
-    null,
-    function(data){
-        console.log("hi");
-        var temp = data.response1.addr.split(", ");
-        data.response1.country = temp[temp.length - 1];
-    },
-    function(data){
-        console.log("final");
-        var newDoc = document.open("text","replace");
-        newDoc = newDoc.write("<pre>" + JSON.stringify(data, undefined, 2) + "</pre>");
-        newDoc.close();
-    }
-]);    
+function wp1(req, res){
+    var $params = req.params.vars.split("\/\$");
+    var $ip = api([
+        {
+            url: "http://www.telize.com/geoip/$()", 
+            res_type: {lat:"latitude", lon:"longitude"}
+        }
+    ]);
+    var $reverseGeoCode = api([
+        {
+            url: "https://maps.googleapis.com/maps/api/geocode/json?latlng=$(),$()&key=AIzaSyDmqbOvCO6seEzPfFoQi-xn3phiv8igk5M",
+            res_type: {addr: "results[0].formatted_address"}
+        }
+    ])
+    var $weather = api([
+        {
+            url:"https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22$()%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
+            res_type: {temp:"query.results.channel.item.condition.temp", weather:"query.results.channel.item.condition.text"}
+        },
+        {
+            url:"http://api.openweathermap.org/data/2.5/weather?q=$()",
+            res_type: {temp:"main.temp", weather:"weather[0].description"}
+        }
+    ]);
+    var seq = [$ip, $reverseGeoCode, $weather];
+    var $as = apisequence(seq, [["$get(0)"],["$(response.response0.lat)","$(response.response0.lon)"],["$(response.response1.country)"]]);
+    var $res = res;
+    $as.execute($params, [
+        function(data){
+            console.log(data);
+        },
+        function(data){
+            console.log("hi");
+            var temp = data.response1.addr.split(", ");
+            data.response1.country = temp[temp.length - 1];
+        },
+        function(data){
+            console.log("end");
+            console.log(data);
+            $res.write(JSON.stringify(data, undefined, 2));
+        }
+    ]); 
+}
+
+module.exports = wp1; 
 
 ```
 
