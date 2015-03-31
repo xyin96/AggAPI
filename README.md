@@ -14,6 +14,7 @@ AggAPI allows developers to create customizable API macros. Features include:
 ```
 git clone https://github.com/xyin96/AggAPI
 cd AggAPI/node
+npm install bcrypt
 node server.js
 ```
 You now have a server that runs AggAPI! To try out our demo macro (node/macros/wp1.js):
