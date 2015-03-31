@@ -3,7 +3,6 @@ var apisequence = require('./../apimodules/api-sequence.js');
 
 function wp1(req, res){
     var $params = req.params.vars.split("/");
-    console.log($params);
     var $ip = api([
         {
             url: "http://www.telize.com/geoip/$()", 
@@ -56,6 +55,7 @@ function wp1(req, res){
             console.log("end");
             console.log(data);
             $res.write(JSON.stringify(data, undefined, 2));
+            $res.write("DEMOO");
             $res.end();
         }
     ]); 

@@ -22,7 +22,6 @@ app.get('/:macro([a-zA-Z0-9]+)/:vars(*+)', function(req, res) {
 	/* Create json from the url provided */
 	var macro = require('./macros/' + req.params.macro + '.js');
     macro(req, res);
-    res.end();
     delete require.cache[require.resolve('./macros/' + req.params.macro + '.js')];
 });
 
