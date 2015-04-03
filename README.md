@@ -1,4 +1,4 @@
-# AggApi (API Aggregate)
+# ChainPI (API Aggregate)
 This project allows users to create a customizable API that chains different APIs together and returns the aggregated results in a single package.
 
 # Features
